@@ -16,7 +16,7 @@ Step 2 : install python packages `pip install fastapi uvicorn`
 
 Step 2 : install python packages `pip install fastapi uvicorn`
 
-Step 3 : import FastAPI and run the server `uvicorn main:app` (main -> filename, app is the instance inside main)
+Step 3 : import FastAPI and run the server `uvicorn main:app --reload` (main -> filename, app is the instance inside main)
 
 Uvicorn is an ASGI server - Asynchronous Server Gateway Interface
 
