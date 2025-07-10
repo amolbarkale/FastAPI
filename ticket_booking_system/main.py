@@ -133,14 +133,7 @@ def add_sample_data(db: Session):
     db.add_all(sample_expenses)
     db.commit()
 
-# Initialize sample data
-@app.on_event("startup")
-async def startup_event():
-    db = SessionLocal()
-    try:
-        add_sample_data(db)
-    finally:
-        db.close()
+# Sample data initialization is now handled by the lifespan context manager above
 
 # API Endpoints
 
@@ -1042,4 +1035,4 @@ if __name__ == "__main__":
     print("🌐 Web Interface available at: http://localhost:8000")
     print("\nPress Ctrl+C to stop the server")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
