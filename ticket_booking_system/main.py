@@ -298,7 +298,8 @@ async def home(
         "category_summary": category_summary,
         "selected_category": category,
         "start_date": start_date,
-        "end_date": end_date
+        "end_date": end_date,
+        "current_date": datetime.now().strftime('%Y-%m-%d')
     })
 
 @app.post("/expenses/create")
