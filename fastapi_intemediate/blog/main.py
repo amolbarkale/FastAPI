@@ -17,9 +17,9 @@ def get_db():
         db.close()
 
 
-@app.post("/blog", status_code=status.HTTP_201_CREATED)
+@app.post("/blog", status_code=status.HTTP_201_CREATED, tags=["blogs"])
 def create_blog(blog: schemas.Blog, db: Session = Depends(get_db)):
-    new_blog = models.Blog(title=blog.title, body=blog.body)
+    new_blog = models.Blog(title=blog.title, body=blog.body, user_id=1)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
@@ -27,7 +27,7 @@ def create_blog(blog: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.get("/blog", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog])
+@app.get("/blog", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog], tags=["blogs"])
 def get_blogs(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     
@@ -36,16 +36,17 @@ def get_blogs(db: Session = Depends(get_db)):
     return blogs
 
 
-@app.get("/blogs/{id}", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog])
+@app.get("/blog/{id}", status_code=status.HTTP_200_OK, response_model=schemas.ShowBlog, tags=["blogs"])
 def get_blog(id: int, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    print('bloggg:', blog)
     
     if not blog:
         raise HTTPException(status_code=404, detail="Not Found")
     return blog
 
 
-@app.delete("/blog", status_code=204)
+@app.delete("/blog", status_code=204, tags=["blogs"])
 def delete_blog(id:int, db: Session = Depends(get_db)):
     deleted_blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not delete_blog.first():
@@ -56,7 +57,7 @@ def delete_blog(id:int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.put("/blog", status_code=202)
+@app.put("/blog", status_code=202, tags=["blogs"])
 def update_blog(id, updated_blog: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     
@@ -67,7 +68,7 @@ def update_blog(id, updated_blog: schemas.Blog, db: Session = Depends(get_db)):
     db.commit()
     return "updated"
 
-@app.post("/user", response_model=schemas.ShowUser)
+@app.post("/user", response_model=schemas.ShowUser, tags=["users"])
 def create_user(user: schemas.User, db: Session = Depends(get_db)):
     new_user = models.User(name=user.name, email=user.email, password=user.password)
     db.add(new_user)
@@ -76,7 +77,7 @@ def create_user(user: schemas.User, db: Session = Depends(get_db)):
 
     return new_user
 
-@app.get("/user/{id}")
+@app.get("/user/{id}", response_model=schemas.ShowUser, tags=["users"])
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
