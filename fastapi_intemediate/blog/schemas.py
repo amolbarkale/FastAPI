@@ -6,5 +6,16 @@ class Blog(BaseModel):
 
 class ShowBlog(Blog):
     class Config:
-        orm_mode=True
+        from_attributes = True
 
+class User(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class ShowUser(BaseModel):
+    name: str
+    email: str
+    
+    class Config:
+        from_attributes = True
