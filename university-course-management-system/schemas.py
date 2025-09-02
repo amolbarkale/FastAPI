@@ -1,12 +1,6 @@
+from datetime import date
 from pydantic import BaseModel, Field, PositiveInt, confloat, conint, EmailStr
 from typing import Optional, List
-
-# GET /courses # Get all courses
-# POST /courses # Create new course
-# GET /courses/{id} # Get specific course
-# PUT /courses/{id} # Update course
-# DELETE /courses/{id} # Delete course
-# GET /courses/{id}/students # Get course roster
 
 class CourseBase(BaseModel):
     name: str
@@ -45,12 +39,6 @@ class CourseResponse(BaseModel):
 CourseListResponse = List[CourseResponse]
 
 # _______________________________________________________________
-# GET /students # Get all students
-# POST /students # Create new student
-# GET /students/{id} # Get specific student
-# PUT /students/{id} # Update student
-# DELETE /students/{id} # Delete student
-# GET /students/{id}/courses # Get student's courses
 
 class StudentBase(BaseModel):
     name: str
@@ -61,7 +49,6 @@ class StudentBase(BaseModel):
 
     class Config:
         from_attributes = True
-
 
 class StudentCreate(StudentBase):
     pass
@@ -95,5 +82,31 @@ class CourseRosterResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 # _______________________________________________________________
 
+class ProfessorBase(BaseModel):
+    name: str
+    email: str
+    department: str
+    hire_date: date
+
+class ProfessorCreate(ProfessorBase):
+    pass
+
+class ProfessorUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    department: Optional[str] = None
+    hire_date: Optional[date] = None
+
+    class Config():
+        from_attributes = True
+
+class ProfessorResponse(ProfessorBase):
+    courses: List["CourseResponse"] = Field(default_factory=list)
+
+    class Config():
+        from_attributes = True
+
+ProfessorListResponse = List[ProfessorResponse]
