@@ -105,5 +105,3 @@ class ProfessorResponse(ProfessorBase):
 
     class Config():
         from_attributes = True
-
-ProfessorListResponse = List[ProfessorResponse]
