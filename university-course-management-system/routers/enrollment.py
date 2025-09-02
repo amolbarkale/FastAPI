@@ -17,13 +17,11 @@
 #     db.refresh(new_enrollment)
 #     return new_enrollment
 
-# # GET /enrollments # Get all enrollments
 # @router.get("/", response_model=List[schemas.EnrollmentResponse])
 # def get_enrollments(db: Session = Depends(get_db)):
 #     enrollments = db.query(models.Enrollments).all()
 #     return enrollments
 
-# # PUT /enrollments/{student_id}/{course_id} # Update grade
 # @router.put("/{student_id}/{course_id}", response_model=schemas.EnrollmentResponse)
 # def update_enrollment(student_id: int, course_id: int, enrollment: schemas.EnrollmentUpdate, db: Session = Depends(get_db)):
 #     db_enrollment = db.query(models.Enrollments).filter(models.Enrollments.student_id == student_id, models.Enrollments.course_id == course_id).first()
