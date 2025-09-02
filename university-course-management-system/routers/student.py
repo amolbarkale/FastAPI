@@ -59,3 +59,18 @@ def delete_student(id: int, db: Session = Depends(get_db)):
     deleted_Student.delete(synchronize_session="evaluate")
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/{student_id}/courses", response_model=List[schemas.StudentWithCoursesResponse])
+def get_student_courses(student_id: int, db: Session = Depends(get_db)):
+    courses = (
+        db.query(models.Courses)
+        .join(models.Enrollments, models.Courses.id == models.Enrollments.course_id)
+        .filter(models.Enrollments.student_id == student_id)
+        .all()
+    )
+
+    if not courses:
+        raise HTTPException(status_code=404, detail="No courses found")
+
+    return courses
