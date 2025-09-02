@@ -44,7 +44,7 @@ class StudentBase(BaseModel):
     name: str
     email: EmailStr
     major: Optional[str] = None
-    year: int = conint(ge=2020, le=2025)
+    year: int = conint(ge=1, le=4)
     gpa: float = confloat(ge=3.0, le=9.0)
 
     class Config:
@@ -72,7 +72,8 @@ class StudentResponse(StudentBase):
 StudentListResponse = List[StudentResponse]
 
 class StudentWithCoursesResponse(StudentResponse):
-    courses: List[CourseBase] = []
+    courses: List[CourseResponse] = Field(default_factory=list)
+
     class Config:
         from_attributes = True
 
@@ -87,7 +88,7 @@ class CourseRosterResponse(BaseModel):
 
 class ProfessorBase(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     department: str
     hire_date: date
 
@@ -96,7 +97,7 @@ class ProfessorCreate(ProfessorBase):
 
 class ProfessorUpdate(BaseModel):
     name: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     department: Optional[str] = None
     hire_date: Optional[date] = None
 
