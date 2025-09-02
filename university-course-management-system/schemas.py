@@ -69,8 +69,6 @@ class StudentResponse(StudentBase):
     class Config:
         from_attributes = True
 
-StudentListResponse = List[StudentResponse]
-
 class StudentWithCoursesResponse(StudentResponse):
     courses: List[CourseResponse] = Field(default_factory=list)
 
