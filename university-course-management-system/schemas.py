@@ -36,8 +36,6 @@ class CourseResponse(BaseModel):
     class Config:
         from_attributes = True
 
-CourseListResponse = List[CourseResponse]
-
 # _______________________________________________________________
 
 class StudentBase(BaseModel):
