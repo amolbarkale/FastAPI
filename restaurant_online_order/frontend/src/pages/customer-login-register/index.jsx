@@ -97,7 +97,7 @@ function CustomerLoginRegister() {
 
     if (!formData.email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
 
@@ -181,6 +181,63 @@ function CustomerLoginRegister() {
   const handleForgotPassword = () => {
     console.log('Forgot password clicked');
     // In real app, this would open a modal or navigate to reset page
+  };
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/restaurants/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.access_token); // Store the token
+      navigate("/"); // Redirect to the home page
+    } catch (error) {
+      setErrors({ login: error.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("restaurants/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.firstName + " " + formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Registration failed");
+      }
+
+      setErrors({}); // Clear errors on success
+      navigate("/customer-login-register"); // Redirect to login tab
+    } catch (error) {
+      setErrors({ register: error.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -502,34 +559,6 @@ function CustomerLoginRegister() {
                 )}
               </div>
 
-              {errors.acceptTerms && (
-                <p className="text-error text-sm font-body">{errors.acceptTerms}</p>
-              )}
-
-              {errors.submit && (
-                <div className="p-3 bg-error-50 border border-error-100 rounded-lg">
-                  <p className="text-error text-sm font-body">{errors.submit}</p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-smooth font-body font-body-medium min-h-touch"
-              >
-                {isLoading && <Icon name="Loader2" size={20} className="animate-spin" />}
-                <span>
-                  {isLoading 
-                    ? 'Please wait...' 
-                    : activeTab === 'login' ?'Sign In' :'Create Account'
-                  }
-                </span>
-              </button>
-            </form>
-
-            {/* Additional Links */}
-            {activeTab === 'login' && (
               <div className="mt-6 text-center">
                 <button
                   onClick={handleForgotPassword}
@@ -538,7 +567,17 @@ function CustomerLoginRegister() {
                   Forgot your password?
                 </button>
               </div>
-            )}
+
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  onClick={handleLogin}
+                  className="w-full py-3 px-4 bg-primary text-white rounded-lg hover:bg-primary-700 transition-smooth font-body font-body-medium"
+                >
+                  Login
+                </button>
+              </div>
+            </form>
 
             {/* Guest Checkout */}
             <div className="mt-6 pt-6 border-t border-border text-center">

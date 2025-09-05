@@ -1,52 +1,18 @@
-from datetime import timedelta
-import os
-from typing import Annotated, List
-from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .auth import authenticate_user, create_access_token, get_current_active_user
-from .database import get_db
-from .schemas import RestaurantResponse, RestaurantCreate, RestaurantUpdate
-from .models import Restaurants, Users
-from .schemas import UserBase, Token
+from typing import List
+import os
+
+from .. import auth 
+
+from ..schemas import RestaurantResponse, RestaurantCreate, RestaurantUpdate, UserBase
+from ..models import Restaurants, Users
+from ..database import get_db
 
 router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
+ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
 
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
-
-
-@router.get("/users/me/", response_model=UserBase)
-async def read_users_me(
-    current_user: Annotated[UserBase, Depends(get_current_active_user)],
-):
-    return current_user
-
-
-@router.get("/users/me/items/")
-async def read_own_items(
-    current_user: Annotated[UserBase, Depends(get_current_active_user)],
-):
-    return [{"item_id": "Foo", "owner": current_user.username}]
-
-@router.post("/token")
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-) -> Token:
-    user = authenticate_user(Users, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return Token(access_token=access_token, token_type="bearer")
-
-#____________________________________________________________________________________________________________
 
 @router.get("/", response_model=List[RestaurantResponse])
 def get_restaurants(db: Session = Depends(get_db)):
@@ -116,5 +82,3 @@ def update_restaurant(restaurant_id: int, update_restaurant: RestaurantUpdate, d
     db.refresh(curr_restaurant)
 
     return curr_restaurant
-
-
