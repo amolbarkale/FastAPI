@@ -44,12 +44,12 @@ class MenuItems(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column((String(100)), nullable=False)
     description: Mapped[str] = mapped_column(String(500))
-    price: Mapped[float] = mapped_column(Float, nullable=False)  # Decimal with 2 decimal places
+    price: Mapped[float] = mapped_column(Float, nullable=False)
     category: Mapped[str] = mapped_column(String(50), nullable=False) # "Appetizer", "Main Course", "Dessert", "Beverage"
-    is_vegetarian: Mapped[bool] = mapped_column(Boolean, default=False) # Boolean, default False
-    is_vegan: Mapped[bool] = mapped_column(Boolean, default=False)              # Boolean, default False
-    is_available: Mapped[bool] = mapped_column(Boolean, default=True)           # Boolean, default True
-    preparation_time: Mapped[int] = mapped_column(Integer, nullable=False)      # Integer, minutes
-    restaurant_id: Mapped[int] = mapped_column(Integer, ForeignKey("restaurants.id"), nullable=False)  # Foreign Key to Restaurant
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())  # Timestamp
+    is_vegetarian: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_vegan: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_available: Mapped[bool] = mapped_column(Boolean, default=True)
+    preparation_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    restaurant_id: Mapped[int] = mapped_column(Integer, ForeignKey("restaurants.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())  # Timestamp
