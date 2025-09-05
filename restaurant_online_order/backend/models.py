@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, CheckConstraint, Date, Time, Float, Boolean, DateTime, Text, func
+from sqlalchemy import ForeignKey, Integer, String, CheckConstraint, Date, Time, Float, Boolean, DateTime, Text, func
 from .database import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from datetime import datetime, time
@@ -37,3 +37,19 @@ class Users(Base):
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+
+class MenuItems(Base):
+    __tablename__ = "menu_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column((String(100)), nullable=False)
+    description: Mapped[str] = mapped_column(String(500))
+    price: Mapped[float] = mapped_column(Float, nullable=False)  # Decimal with 2 decimal places
+    category: Mapped[str] = mapped_column(String(50), nullable=False) # "Appetizer", "Main Course", "Dessert", "Beverage"
+    is_vegetarian: Mapped[bool] = mapped_column(Boolean, default=False) # Boolean, default False
+    is_vegan: Mapped[bool] = mapped_column(Boolean, default=False)              # Boolean, default False
+    is_available: Mapped[bool] = mapped_column(Boolean, default=True)           # Boolean, default True
+    preparation_time: Mapped[int] = mapped_column(Integer, nullable=False)      # Integer, minutes
+    restaurant_id: Mapped[int] = mapped_column(Integer, ForeignKey("restaurants.id"), nullable=False)  # Foreign Key to Restaurant
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())  # Timestamp
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())  # Timestamp
