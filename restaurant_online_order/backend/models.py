@@ -1,11 +1,13 @@
-from pydantic import EmailStr
 from sqlalchemy import Integer, String, CheckConstraint, Date, Time, Float, Boolean, DateTime, Text, func
 from .database import Base
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from datetime import datetime, time
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class Restaurants(Base):
-    __table__ = "restaurants"
+    __tablename__ = "restaurants"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column((String(100)), nullable=False)
@@ -13,7 +15,7 @@ class Restaurants(Base):
     cuisine_type: Mapped[str] = mapped_column(String(50), index=True, nullable=False) # "Italian", "Chinese", "Indian"
     address: Mapped[str] = mapped_column(Text, nullable=False)
     phone_number: Mapped[str] = mapped_column(String(15), nullable=False)
-    email: Mapped[EmailStr] = mapped_column(EmailStr, nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     rating: Mapped[float] = mapped_column(Float, default=0.0)  # 0.0-5.0
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     opening_time: Mapped[time] = mapped_column(Time)  # "09:00"
@@ -27,3 +29,11 @@ class Restaurants(Base):
         CheckConstraint('LENGTH(phone_number) >= 10', name='phone_number_validation'),
 
     )
+
+class Users(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)

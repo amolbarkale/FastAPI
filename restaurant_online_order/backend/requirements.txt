@@ -1,3 +1,7 @@
 fastapi[standard]
 sqlalchemy
 uvicorn
+pyjwt
+passlib[bcrypt]
+jose
+python-dotenv
