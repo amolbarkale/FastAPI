@@ -46,7 +46,5 @@ class UserBase(BaseModel):
     username: str
     email: str | None = None
     disabled: bool | None = None
+    password: str
 
-
-class UserInDB(UserBase):
-    hashed_password: str

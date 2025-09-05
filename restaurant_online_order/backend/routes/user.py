@@ -12,16 +12,17 @@ from ..schemas import UserBase, Token
 from ..models import Users
 from ..database import get_db
 
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/auth", tags=["Users"])
 
 
-@router.post("/token")
+@router.post("/login")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db),
 ) -> Token:
-    user = authenticate_user(Users, form_data.username, form_data.password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -34,7 +35,8 @@ async def login_for_access_token(
     )
     return Token(access_token=access_token, token_type="bearer")
 
-@router.post("/auth/register", status_code=201)
+
+@router.post("/register", status_code=201)
 def register_user(user: UserBase, db: Session = Depends(get_db)):
     existing_user = db.query(Users).filter(Users.email == user.email).first()
     if existing_user:
@@ -43,7 +45,7 @@ def register_user(user: UserBase, db: Session = Depends(get_db)):
     new_user = Users(
         username=user.username,
         email=user.email,
-        hashed_password=get_password_hash(user.password),
+        password=get_password_hash(user.password),
     )
     db.add(new_user)
     db.commit()
