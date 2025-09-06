@@ -48,3 +48,30 @@ class UserBase(BaseModel):
     disabled: bool | None = None
     password: str
 
+
+# GET /restaurants/{restaurant_id}/menu - Get all menu items for a restaurant
+# GET /restaurants/{restaurant_id}/with-menu - Get restaurant with all menu items
+
+# POST /restaurants/{restaurant_id}/menu-items/ - Add menu item to restaurant
+# PUT /menu-items/{item_id} - Update menu item
+# DELETE /menu-items/{item_id} - Delete menu item
+class MenuItemBase(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    price: float = Field(..., gt=0)
+    category: str = Field(..., max_length=50)  # "Appetizer", "Main Course", "Dessert", "Beverage"
+    is_vegetarian: Optional[bool] = False
+    is_vegan: Optional[bool] = False
+    is_available: Optional[bool] = True
+    preparation_time: int = Field(..., gt=0)  # in minutes
+    restaurant_id: int
+
+class MenuItemResponse(MenuItemBase):
+    class Config:
+        from_attributes = True
+
+class MenuItemWithRestaurantResponse(MenuItemResponse):
+    restaurant: RestaurantResponse
+    
+    class Config:
+        from_attributes = True

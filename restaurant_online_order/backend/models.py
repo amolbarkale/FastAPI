@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import ForeignKey, Integer, String, CheckConstraint, Date, Time, Float, Boolean, DateTime, Text, func
 from .database import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -30,6 +31,9 @@ class Restaurants(Base):
 
     )
 
+    menu_items: Mapped[List["MenuItems"]] = relationship(back_populates="restaurant", cascade="all, delete-orphan")
+
+
 class Users(Base):
     __tablename__ = "users"
 
@@ -53,3 +57,6 @@ class MenuItems(Base):
     restaurant_id: Mapped[int] = mapped_column(Integer, ForeignKey("restaurants.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())  # Timestamp
+
+    restaurant: Mapped["Restaurants"] = relationship(back_populates="menu_items")
+
