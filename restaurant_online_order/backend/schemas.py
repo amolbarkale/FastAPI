@@ -48,13 +48,6 @@ class UserBase(BaseModel):
     disabled: bool | None = None
     password: str
 
-
-# GET /restaurants/{restaurant_id}/menu - Get all menu items for a restaurant
-# GET /restaurants/{restaurant_id}/with-menu - Get restaurant with all menu items
-
-# POST /restaurants/{restaurant_id}/menu-items/ - Add menu item to restaurant
-# PUT /menu-items/{item_id} - Update menu item
-# DELETE /menu-items/{item_id} - Delete menu item
 class MenuItemBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
@@ -72,6 +65,35 @@ class MenuItemResponse(MenuItemBase):
 
 class MenuItemWithRestaurantResponse(MenuItemResponse):
     restaurant: RestaurantResponse
+    
+    class Config:
+        from_attributes = True
+
+class RestaurantWithMenuResponse(RestaurantResponse):
+    menu_items: list[MenuItemResponse] = []
+    
+    class Config:
+        from_attributes = True
+
+class MenuItemsForRestaurantResponse(BaseModel):
+    menu_items: list[MenuItemResponse] = []
+    
+    class Config:
+        from_attributes = True
+
+class MenuItemCreate(MenuItemBase):
+    pass
+
+class MenuItemUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    description: Optional[str] = Field(default=None, max_length=500)
+    price: Optional[float] = Field(default=None, gt=0)
+    category: Optional[str] = Field(default=None, max_length=50)
+    is_vegetarian: Optional[bool] = Field(default=None)
+    is_vegan: Optional[bool] = Field(default=None)
+    is_available: Optional[bool] = Field(default=None)
+    preparation_time: Optional[int] = Field(default=None, gt=0)
+    restaurant_id: Optional[int] = Field(default=None)
     
     class Config:
         from_attributes = True
