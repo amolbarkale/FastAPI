@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import models, database
+import models, database
 from .routes import restaurant, user, menu_items
 
 models.Base.metadata.create_all(bind=database.engine)
