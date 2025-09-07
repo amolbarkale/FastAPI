@@ -14,7 +14,7 @@ load_dotenv()
 from .database import get_db
 
 from .models import Users
-from .schemas import TokenData
+from .schemas import user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -67,7 +67,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = user.TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
     user = get_user(Users, username=token_data.username)

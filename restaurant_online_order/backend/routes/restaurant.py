@@ -1,23 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-
-from typing import List
 import os
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from dotenv import load_dotenv
 
-from .. import auth 
-
-from ..schemas import RestaurantResponse, RestaurantCreate, RestaurantUpdate, UserBase
-from ..models import Restaurants, Users
+from ..schemas import restaurants
+from ..models import Restaurants
 from ..database import get_db
 
+from ..cache import make_key, get_cache, get_version, set_cache, bump_version
+
 router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
+
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
 
+load_dotenv()
 
-@router.get("/", response_model=List[RestaurantResponse])
-def get_restaurants(db: Session = Depends(get_db)):
-    restaurants = db.query(Restaurants).all()
-    return restaurants
+CACHE_TTL = os.getenv("CACHE_TTL")
+
+@router.get("/", response_model=List[restaurants.RestaurantResponse])
+async def get_restaurants(db: Session = Depends(get_db)):
+    cache_key = make_key("restaurants_list")
+
+    cache_data = await get_cache(cache_key)
+
+    if cache_data:
+        print("fetched restaurants data from CACHE", cache_data)
+        return [restaurants.RestaurantResponse(**item) for item in cache_data]
+
+    db_restaurants = db.query(Restaurants).all()
+
+    response = [restaurants.RestaurantResponse.from_orm(r).dict() for r in db_restaurants]
+
+    await set_cache(cache_key, response, ttl=CACHE_TTL)
+
+    return [restaurants.RestaurantResponse(**item) for item in response]
 
 @router.get("/{restaurant_id}")
 def get_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
@@ -35,7 +52,7 @@ def get_active_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
     
     return restaurant
 
-@router.get("/search", response_model=List[RestaurantResponse])
+@router.get("/search", response_model=List[restaurants.RestaurantResponse])
 def search_restaurants(cuisine: str = None, db: Session = Depends(get_db)):
     query = db.query(Restaurants)
     
@@ -58,8 +75,8 @@ def delete_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
     
     return {"detail": "Restaurant deleted"}
 
-@router.post("/", status_code=201, response_model=RestaurantResponse)
-def add_restaurant(restaurant: RestaurantCreate, db: Session = Depends(get_db)):
+@router.post("/", status_code=201, response_model=restaurants.RestaurantResponse)
+def add_restaurant(restaurant: restaurants.RestaurantCreate, db: Session = Depends(get_db)):
     new_restaurant = Restaurants(**restaurant.model_dump())
     db.add(new_restaurant)
     db.commit()
@@ -67,9 +84,8 @@ def add_restaurant(restaurant: RestaurantCreate, db: Session = Depends(get_db)):
     return new_restaurant
 
 @router.put("/{restaurant_id}")
-def update_restaurant(restaurant_id: int, update_restaurant: RestaurantUpdate, db: Session = Depends(get_db)):
+def update_restaurant(restaurant_id: int, update_restaurant: restaurants.RestaurantUpdate, db: Session = Depends(get_db)):
     curr_restaurant = db.query(Restaurants).filter(Restaurants.id == restaurant_id).first()
-    print('curr_restaurant:', curr_restaurant)
 
     if not curr_restaurant:
         raise HTTPException(status_code=404, detail="Not found to update")

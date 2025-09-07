@@ -3,13 +3,17 @@ from sqlalchemy.orm import Session
 from typing import List
 import os
 from .. import auth
-from ..schemas import MenuItemBase, UserBase
+# from ..schemas import MenuItemBase, UserBase
+from ..schemas import restaurants, user
 from ..models import MenuItems, Users, Restaurants
 from ..database import get_db
 
 router = APIRouter(prefix="/menu-items", tags=["Menu Items"])
 
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
+
+MenuItemBase = restaurants.MenuItemBase
+UserBase = user.UserBase
 
 @router.post("/restaurants/{restaurant_id}/menu-items/", response_model=MenuItemBase)
 def add_menu_item(restaurant_id: int, item: MenuItemBase, db: Session = Depends(get_db), current_user: UserBase = Depends(auth.get_current_user)):

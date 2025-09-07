@@ -108,4 +108,3 @@ class Reviews(Base):
 
     customer: Mapped["Users"] = relationship(back_populates="reviews")
     restaurant: Mapped["Restaurants"] = relationship(back_populates="reviews")
-    order: Mapped["Orders"] = relationship(back_populates="reviews")

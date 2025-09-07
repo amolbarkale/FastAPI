@@ -5,3 +5,8 @@ pyjwt
 passlib[bcrypt]
 jose
 python-dotenv
+
+aiocache
+redis[async]
+aiosqlite
+orjson

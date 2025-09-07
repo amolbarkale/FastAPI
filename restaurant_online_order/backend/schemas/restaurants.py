@@ -14,6 +14,17 @@ class RestaurantBase(BaseModel):
     opening_time: time  # "09:00"
     closing_time: time  # "21:00"
 
+class MenuItemBase(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    price: float = Field(..., gt=0)
+    category: str = Field(..., max_length=50)  # "Appetizer", "Main Course", "Dessert", "Beverage"
+    is_vegetarian: Optional[bool] = False
+    is_vegan: Optional[bool] = False
+    is_available: Optional[bool] = True
+    preparation_time: int = Field(..., gt=0)  # in minutes
+    restaurant_id: int
+
 class RestaurantResponse(RestaurantBase):
     class Config:
         from_attributes = True
@@ -32,32 +43,7 @@ class RestaurantUpdate(BaseModel):
     is_active: Optional[bool] = Field(default=None)
     opening_time: Optional[time] = Field(default=None)
     closing_time: Optional[time] = Field(default=None)
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
-class UserBase(BaseModel):
-    username: str
-    email: str | None = None
-    disabled: bool | None = None
-    password: str
-
-class MenuItemBase(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    description: Optional[str] = Field(None, max_length=500)
-    price: float = Field(..., gt=0)
-    category: str = Field(..., max_length=50)  # "Appetizer", "Main Course", "Dessert", "Beverage"
-    is_vegetarian: Optional[bool] = False
-    is_vegan: Optional[bool] = False
-    is_available: Optional[bool] = True
-    preparation_time: int = Field(..., gt=0)  # in minutes
-    restaurant_id: int
+# ____________________________________________________________________
 
 class MenuItemResponse(MenuItemBase):
     class Config:
