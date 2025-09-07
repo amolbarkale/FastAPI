@@ -8,7 +8,7 @@ from ..schemas import restaurants
 from ..models import Restaurants
 from ..database import get_db
 
-from ..cache import make_key, get_cache, get_version, set_cache, bump_version
+from ..cache import make_key, get_cache, set_cache
 
 router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
 
@@ -39,8 +39,10 @@ async def get_restaurants(db: Session = Depends(get_db)):
 @router.get("/{restaurant_id}")
 def get_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
     restaurant = db.query(Restaurants).filter(Restaurants.id == restaurant_id).first()
+    
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
+    
     return restaurant
 
 @router.get("/active/{restaurant_id}")
@@ -78,9 +80,11 @@ def delete_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
 @router.post("/", status_code=201, response_model=restaurants.RestaurantResponse)
 def add_restaurant(restaurant: restaurants.RestaurantCreate, db: Session = Depends(get_db)):
     new_restaurant = Restaurants(**restaurant.model_dump())
+    
     db.add(new_restaurant)
     db.commit()
     db.refresh(new_restaurant)
+    
     return new_restaurant
 
 @router.put("/{restaurant_id}")
@@ -95,6 +99,7 @@ def update_restaurant(restaurant_id: int, update_restaurant: restaurants.Restaur
             setattr(curr_restaurant, key, value)
     
     db.commit()
+    
     db.refresh(curr_restaurant)
 
     return curr_restaurant
