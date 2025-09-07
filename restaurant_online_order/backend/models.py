@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from datetime import datetime, time
 from passlib.context import CryptContext
 
-from .database import Base
+from database import Base
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

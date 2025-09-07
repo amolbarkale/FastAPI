@@ -11,10 +11,7 @@ import os
 
 load_dotenv()
 
-from .database import get_db
-
-from .models import Users
-from .schemas import user
+from models import Users
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
