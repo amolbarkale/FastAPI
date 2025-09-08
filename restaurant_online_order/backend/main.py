@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import models, database
+from models import Base
+from database import engine
 from routes import restaurant, user, menu_items
 
-models.Base.metadata.create_all(bind=database.engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Restaurant Online Order API", version="1.0.0")
 

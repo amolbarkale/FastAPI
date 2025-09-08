@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 import os
-from .. import auth
-# from ..schemas import MenuItemBase, UserBase
-from ..schemas import restaurants, user
-from ..models import MenuItems, Users, Restaurants
-from ..database import get_db
+
+import auth
+from schemas import restaurants, user
+from models import MenuItems, Users, Restaurants
+from database import get_db
 
 router = APIRouter(prefix="/menu-items", tags=["Menu Items"])
 

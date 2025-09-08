@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
-from ..schemas import restaurants
-from ..models import Restaurants
-from ..database import get_db
+from schemas import restaurants
+from models import Restaurants
+from database import get_db
 
-from ..cache import make_key, get_cache, set_cache
+from cache import make_key, get_cache, set_cache
 
 router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
 

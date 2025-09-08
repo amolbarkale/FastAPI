@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.log
+.venv/
+venv/
+.env
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Database (if you don't want it in the image)
+restaurants.db
+
+# IDE files
+.vscode/
+.idea/
